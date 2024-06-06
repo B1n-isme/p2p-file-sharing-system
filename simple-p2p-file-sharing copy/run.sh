@@ -18,20 +18,25 @@ run_server()
     fi
 }
 
+# run_client()
+# {
+#     DIRECTORY=$1
+#     PORT=$2
+#     SERVER=$3
+#     SERVERPORT=$4
+
+#     if [ $# -eq 2 ]; then
+#         java -jar build/Client.jar $DIRECTORY $PORT
+#     elif [ $# -eq 4 ]; then
+#         java -jar build/Client.jar $DIRECTORY $PORT $SERVER $SERVERPORT
+#     else
+#         echo "It should be run_client directory port"
+#     fi
+# }
+
 run_client()
 {
-    DIRECTORY=$1
-    PORT=$2
-    SERVER=$3
-    SERVERPORT=$4
-
-    if [ $# -eq 2 ]; then
-        java -jar build/Client.jar $DIRECTORY $PORT
-    elif [ $# -eq 4 ]; then
-        java -jar build/Client.jar $DIRECTORY $PORT $SERVER $SERVERPORT
-    else
-        echo "It should be run_client directory port"
-    fi
+    java -jar build/Client.jar 
 }
 
 # bench_lookup()

@@ -36,11 +36,11 @@ public class Util {
 		return (end-start)/1000;
 	}
 	
-	public static String getExternalIP() throws IOException{
-		URL url = new URL("http://checkip.amazonaws.com/");
-    	BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
-    	return br.readLine();
-	}
+		public static String getExternalIP() throws IOException{
+			URL url = new URL("http", "checkip.amazonaws.com", -1, "/");
+	    	BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
+	    	return br.readLine();
+		}
 	
 	public static double calculateAverage(ArrayList<Long> times) {
 		  Long sum = 0L;

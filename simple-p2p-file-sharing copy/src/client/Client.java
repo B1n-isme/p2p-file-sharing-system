@@ -8,6 +8,8 @@ import java.util.ArrayList;
 
 
 import util.Util;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -26,11 +28,41 @@ public class Client {
     public Peer peer;
     public String[] peerAddress = new String[0];
 	public JButton runClientButton;
+	public JLabel backgroundLabel;
+	// public class BackgroundPanel extends JPanel {
+    // private Image img;
+
+    // public BackgroundPanel(String filename) {
+    //     try {
+    //         img = ImageIO.read(new File(filename));
+    //     } catch (IOException e) {
+    //         e.printStackTrace();
+    //     }
+    // }
+
+    // @Override
+    // protected void paintComponent(Graphics g) {
+    //     super.paintComponent(g);
+    //     g.drawImage(img, 0, 0, getWidth(), getHeight(), this);
+    // }
+// }
 
     public Client() {
         frame = new JFrame("Peer UI");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(400, 200);
+		frame.setSize(600, 300);
+		frame.setLocationRelativeTo(null);
+
+		// Set the background image
+		// JFrame frame = new JFrame("Background Image");
+        // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		ImageIcon background = new ImageIcon("background.jpg"); // Replace with your image path
+		backgroundLabel = new JLabel();
+		backgroundLabel.setIcon(background);
+		backgroundLabel.setHorizontalAlignment(JLabel.CENTER);
+		frame.add(backgroundLabel, BorderLayout.NORTH);
+
 
         panel = new JPanel();
         panel.setLayout(new GridLayout(6, 2));
@@ -54,9 +86,13 @@ public class Client {
         runClientButton = new JButton("Run Client");
 		runClientButton.addActionListener(new runClientButtonListener());
 		panel.add(runClientButton);
-		
+
+		// panel.setBackground(Color.WHITE);
+
+		// bgpanel.add(panel, BorderLayout.CENTER);
+
 		// Add panel to frame
-		frame.add(panel, BorderLayout.NORTH);
+		frame.add(panel);
 		frame.setVisible(true);
 
 
@@ -198,7 +234,7 @@ public class Client {
 		// panel.revalidate();
 		// panel.repaint();
 
-		frame.setSize(600, 200);
+		frame.setSize(600, 300);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
 
