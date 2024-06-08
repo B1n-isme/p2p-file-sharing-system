@@ -6,6 +6,8 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import java.util.List;
+
 
 import util.Util;
 
@@ -18,6 +20,7 @@ public class Client {
 	public JPanel panel;
     public JButton lookupButton;
     public JButton downloadButton;
+	public JButton listFilesButton;
     public JButton exitButton;
     public Peer peer;
     public String[] peerAddress = new String[0];
@@ -123,7 +126,6 @@ public class Client {
     public void runClient(String folderDirectory, int clientPort, String serverAddress, int serverPort) throws IOException {
         String dir = folderDirectory;
         File folder = new File(dir);
-		String fileName = null;
         String address = InetAddress.getLocalHost().getHostAddress();
 
 		//get all file names in folder
@@ -158,17 +160,22 @@ public class Client {
 		// panel.removeAll();
 		// panel.setLayout(new GridLayout(1,3)); // 1 row, 3 columns
 		
-		JPanel buttonPanel = new JPanel(new GridLayout(1, 3));
+		// Add buttons to list all file of the peer registered in the server
+
+		JPanel buttonPanel = new JPanel(new GridLayout(1, 4));
 		// buttonPanel.add(new JLabel("Options:"));
+		listFilesButton = new JButton("List Files");
 		lookupButton = new JButton("Lookup File");
 		downloadButton = new JButton("Download File");
 		exitButton = new JButton("Exit Server");
 		
+		buttonPanel.add(listFilesButton);
 		buttonPanel.add(lookupButton);
 		buttonPanel.add(downloadButton);
 		buttonPanel.add(exitButton);
 
 		frame.add(buttonPanel, BorderLayout.SOUTH);
+
 
 		lookupButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -233,9 +240,39 @@ public class Client {
 			}
 		});
 
+		// list file of other peer in the server using the listServerFiles from the peer.java
+
+		listFilesButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new Thread(new Runnable() {
+					public void run() {
+						try {
+							System.out.println("Attempting to list files from server...");
+							List<String> serverFiles = peer.listServerFiles(new Socket(serverAddressField.getText(), Integer.parseInt(serverPortField.getText())));
+							if (serverFiles.isEmpty()) {
+								System.out.println("No files found on the server.");
+							} else {
+								System.out.println("Files received from server: " + serverFiles);
+							}
+							SwingUtilities.invokeLater(new Runnable() {
+								public void run() {
+									JList<String> fileList = new JList<>(serverFiles.toArray(new String[0]));
+									JOptionPane.showMessageDialog(frame, new JScrollPane(fileList), "Files on Server", JOptionPane.INFORMATION_MESSAGE);
+								}
+							});
+						} catch (IOException ex) {
+							ex.printStackTrace();
+							System.out.println("Failed to list files from server: " + ex.getMessage());
+						}
+					}
+				}).start();
+			}
+		});
+
+
 		exitButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("Peer desconnected!");
+				System.out.println("Peer disconnected!");
 				System.exit(0);
 			}
 		});
@@ -248,22 +285,6 @@ public class Client {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
 
-        // Simulate a loop with JOptionPane
-        // while (true) {
-        //     String[] options = {"Lookup File", "Download File", "Exit Server"};
-        //     int choice = JOptionPane.showOptionDialog(frame, "Select an option:", "Peer GUI",
-        //             JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE,
-        //             null, options, options[0]);
-
-        //     if (choice == 0) {
-        //         lookupButton.doClick();
-        //     } else if (choice == 1) {
-        //         downloadButton.doClick();
-        //     } else if (choice == 2) {
-        //         exitButton.doClick();
-        //         break;
-        //     }
-        // }
 	}
 		
 

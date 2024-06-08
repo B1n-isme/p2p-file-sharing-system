@@ -1,5 +1,6 @@
 package client;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
@@ -7,10 +8,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -260,7 +264,49 @@ public class Peer {
 		socket.close();
 	}
 
-    
+	// public List<String> listServerFiles(Socket socket) throws IOException {
+	// 	List<String> fileList = new ArrayList<>();
+		
+	// 	DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
+		
+	// 	dOut.writeByte(2);
+	// 	dOut.flush();
+		
+	// 	// int numFiles = dIn.readInt();
+		
+	// 	// for (int i = 0; i < numFiles; i++) {
+	// 	// 	String fileName = dIn.readUTF();
+	// 	// 	fileList.add(fileName);
+	// 	// }
+		
+	// 	dOut.close();
+	// 	socket.close();
+		
+	// 	return fileList;
+	// }
+	public List<String> listServerFiles(Socket socket) throws IOException {
+		DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
+		DataInputStream dIn = new DataInputStream(socket.getInputStream());
+	
+		// Send request to list files (option 2)
+		dOut.writeByte(2);
+		dOut.flush();
+	
+		// Read the number of files from the server
+		int numFiles = dIn.readInt();
+		List<String> fileNames = new ArrayList<>();
+	
+		// Read each file name
+		for (int i = 0; i < numFiles; i++) {
+			fileNames.add(dIn.readUTF());
+		}
+		
+		dOut.close();
+		dIn.close();
+		socket.close();
+	
+		return fileNames; // Return the list of file names
+	}
 }
 
 	
