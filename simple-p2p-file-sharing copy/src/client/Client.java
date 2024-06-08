@@ -57,7 +57,7 @@ public class Client {
 		// JFrame frame = new JFrame("Background Image");
         // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		ImageIcon background = new ImageIcon("background.jpg"); // Replace with your image path
+		ImageIcon background = new ImageIcon("background.jpg");
 		backgroundLabel = new JLabel();
 		backgroundLabel.setIcon(background);
 		backgroundLabel.setHorizontalAlignment(JLabel.CENTER);
