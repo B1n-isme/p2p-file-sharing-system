@@ -94,102 +94,102 @@ public class Peer {
 		}
     
     public void register(Socket socket) throws IOException {
-    	
+
     	//System.out.println("Connecting to the server...");
-    	long start = System.currentTimeMillis();
-    	DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
-    	
+		long start = System.currentTimeMillis();
+		DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
+
     	//Option to register in the server (new peer)
-    	dOut.writeByte(0);
-    	dOut.flush();
-    
-    	//Number of files
-    	dOut.writeByte(1);
-    	dOut.writeInt(numFiles);
-    	dOut.flush(); 
-    	//Files names
-    	dOut.writeByte(2);
-    	for(String str : fileNames)
-    		dOut.writeUTF(str);
-    	dOut.flush();
-    	dOut.writeByte(3);
-    	dOut.writeUTF(directory);
-    	dOut.flush();
-    	dOut.writeByte(4);
-    	dOut.writeUTF(address);
-    	dOut.flush();
-    	dOut.writeByte(5);
-    	dOut.writeInt(port);
-    	dOut.flush();
-    	dOut.writeByte(-1);
-    	dOut.flush();
-    	
-    	
+		dOut.writeByte(0);
+		dOut.flush();
+
+		//Number of files
+		dOut.writeByte(1);
+		dOut.writeInt(numFiles);
+		dOut.flush(); 
+		//Files names
+		dOut.writeByte(2);
+		for(String str : fileNames)
+			dOut.writeUTF(str);
+		dOut.flush();
+		dOut.writeByte(3);
+		dOut.writeUTF(directory);
+		dOut.flush();
+		dOut.writeByte(4);
+		dOut.writeUTF(address);
+		dOut.flush();
+		dOut.writeByte(5);
+		dOut.writeInt(port);
+		dOut.flush();
+		dOut.writeByte(-1);
+		dOut.flush();
+
+
     	//Reading the Unique Id from the Server
-    	DataInputStream dIn = new DataInputStream(socket.getInputStream());
-    	this.peerId = dIn.readInt();
-    	
-    	dOut.close();
-    	dIn.close();
-    	socket.close();
-    	
-    	System.out.println("Running as Peer " + peerId + "! " + "It Took " + (System.currentTimeMillis() - start) + "ms for register.");
+		DataInputStream dIn = new DataInputStream(socket.getInputStream());
+		this.peerId = dIn.readInt();
+
+		dOut.close();
+		dIn.close();
+		socket.close();
+
+		System.out.println("Running as Peer " + peerId + "! " + "It Took " + (System.currentTimeMillis() - start) + "ms for register.");
     	//System.out.println("Took " + (System.currentTimeMillis() - start) + " ms to register in the server.");
     	//System.out.println((System.currentTimeMillis() - start) + " ms");
     	// if(BenchRegistry.times != null) BenchRegistry.times.add((System.currentTimeMillis() - start));
 	}
 
     public String[] lookup(String fileName, Socket socket, int count) throws IOException{
-    	DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
-    	
-    	//Option to look for a file
-    	dOut.writeByte(1);
-    	
-    	String [] peerAddress = new String[0];
-    	
-    	//File name
-    	dOut.writeUTF(fileName);
-    	dOut.flush();
-    	//System.out.println("Reading from the server...");
-    	
-    	System.out.println("Peer " + peerId + " - looking for file. (" + count + ")");
-    	
-    	//Reading the peer Address that has the file
-    	DataInputStream dIn = new DataInputStream(socket.getInputStream());
-    	byte found = dIn.readByte();
-    	
-    	if(found == 1){
-    		int qt = dIn.readInt();
-    		
-    		peerAddress = new String[qt];
-    		
-    		for(int i = 0; i < qt; i++){
-    			try{
-    			 peerAddress[i] = dIn.readUTF();
-    			}catch (EOFException e){
-    				i--;
-    			}
-    			String paddress[] = peerAddress[i].split(":");
-    			System.out.println("Peer " + paddress[2] + " - " + paddress[0] +":" + paddress[1] + " has the file " + fileName + "! - Looked by Peer " + peerId);
-    		}
-    	} else if(found == 0){
-    		System.out.println("File not found in the system");
-    		peerAddress = new String[0];
-    	}
-    	
-    	dOut.close();
-    	dIn.close();
-    	socket.close();
-    	return peerAddress;
+		DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
+		
+		//Option to look for a file
+		dOut.writeByte(1);
+		
+		String [] peerAddress = new String[0];
+		
+		//File name
+		dOut.writeUTF(fileName);
+		dOut.flush();
+		//System.out.println("Reading from the server...");
+		
+		System.out.println("Peer " + peerId + " - looking for file. (" + count + ")");
+		
+		//Reading the peer Address that has the file
+		DataInputStream dIn = new DataInputStream(socket.getInputStream());
+		byte found = dIn.readByte();
+		
+		if(found == 1){
+			int qt = dIn.readInt();
+			
+			peerAddress = new String[qt];
+			
+			for(int i = 0; i < qt; i++){
+				try{
+					peerAddress[i] = dIn.readUTF();
+				}catch (EOFException e){
+					i--;
+				}
+				String paddress[] = peerAddress[i].split(":");
+				System.out.println("Peer " + paddress[2] + " - " + paddress[0] +":" + paddress[1] + " has the file " + fileName + "! - Looked by Peer " + peerId);
+			}
+		} else if(found == 0){
+			System.out.println("File not found in the system");
+			peerAddress = new String[0];
+		}
+		
+		dOut.close();
+		dIn.close();
+		socket.close();
+		return peerAddress;
     }
     
     public void server() throws IOException{
-    	
-    	try {
-    		serverSocket = new ServerSocket(port);
-    	} catch(Exception e){
-    		return;
-    	}
+		
+		try {
+			serverSocket = new ServerSocket(port);
+		} catch(Exception e){
+			return;
+		}
 		
 		while(true){
 			Socket socket = serverSocket.accept();

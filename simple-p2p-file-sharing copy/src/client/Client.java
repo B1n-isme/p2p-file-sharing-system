@@ -17,11 +17,6 @@ import java.awt.event.*;
 public class Client {
     public JFrame frame;
 	public JPanel panel;
-    public JTextField folderDirectoryField;
-    public JTextField clientPortField;
-    public JTextField serverAddressField;
-    public JTextField serverPortField;
-    public JTextField fileNameField;
     public JButton lookupButton;
     public JButton downloadButton;
     public JButton exitButton;
@@ -46,6 +41,33 @@ public class Client {
     //     g.drawImage(img, 0, 0, getWidth(), getHeight(), this);
     // }
 // }
+	public JTextField createCustomTextField(String text) {
+		JTextField field = new JTextField();
+		field.addFocusListener(new FocusListener() {
+			@Override
+			public void focusGained(FocusEvent e){
+				if (field.getText().equals(text)) {
+					field.setForeground(Color.BLACK);
+					field.setText("");
+				}
+			}
+			
+			@Override
+			public void focusLost(FocusEvent e) {
+				if (field.getText().isEmpty()) {
+					field.setForeground(Color.GRAY);
+					field.setText(text);
+				}
+			}
+		});
+		return field;
+	}
+
+	public JTextField folderDirectoryField = createCustomTextField("Enter the folder directory here");
+    public JTextField clientPortField = createCustomTextField("Enter the client port here");
+    public JTextField serverAddressField = createCustomTextField("Enter the server address here");
+    public JTextField serverPortField = createCustomTextField("Enter the server port here");
+    public JTextField fileNameField;
 
     public Client() {
         frame = new JFrame("Peer UI");
@@ -57,7 +79,7 @@ public class Client {
 		// JFrame frame = new JFrame("Background Image");
         // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		ImageIcon background = new ImageIcon("background.jpg"); // Replace with your image path
+		ImageIcon background = new ImageIcon("C:/Users/ADMIN/Desktop/code/java/DistributedSys/project/Bin/p2p-file-sharing-system/simple-p2p-file-sharing copy/background.jpg"); // Replace with your image path
 		backgroundLabel = new JLabel();
 		backgroundLabel.setIcon(background);
 		backgroundLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -68,19 +90,23 @@ public class Client {
         panel.setLayout(new GridLayout(6, 2));
 
         panel.add(new JLabel("Folder Directory:"));
-        folderDirectoryField = new JTextField("Enter the folder directory here");
+		folderDirectoryField.setForeground(Color.GRAY);
+		folderDirectoryField.setText("Enter the folder directory here");
         panel.add(folderDirectoryField);
 
         panel.add(new JLabel("Client Port:"));
-        clientPortField = new JTextField("Enter the client port here");
+		clientPortField.setForeground(Color.GRAY);
+		clientPortField.setText("Enter the client port here");
         panel.add(clientPortField);
 
         panel.add(new JLabel("Server Address:"));
-        serverAddressField = new JTextField("Enter the server address here");
+		serverAddressField.setForeground(Color.GRAY);
+		serverAddressField.setText("Enter the server address here");
         panel.add(serverAddressField);
 
         panel.add(new JLabel("Server Port:"));
-        serverPortField = new JTextField("Enter the server port here");
+		serverPortField.setForeground(Color.GRAY);
+		serverPortField.setText("Enter the server port here");
         panel.add(serverPortField);
 
         runClientButton = new JButton("Run Client");
@@ -119,8 +145,12 @@ public class Client {
         File folder = new File(dir);
 		String fileName = null;
         String address = InetAddress.getLocalHost().getHostAddress();
+
+		//get all file names in folder
         ArrayList<String> fileNames = Util.listFilesForFolder(folder);
+
         final Peer peer = new Peer(dir, fileNames, fileNames.size(), address, clientPort);
+
         Socket socket = new Socket(serverAddress, serverPort);
         peer.register(socket);
 
