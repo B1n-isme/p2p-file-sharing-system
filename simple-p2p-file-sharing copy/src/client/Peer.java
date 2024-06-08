@@ -137,17 +137,6 @@ public class Peer {
     	//System.out.println("Took " + (System.currentTimeMillis() - start) + " ms to register in the server.");
     	//System.out.println((System.currentTimeMillis() - start) + " ms");
     	// if(BenchRegistry.times != null) BenchRegistry.times.add((System.currentTimeMillis() - start));
-		Thread updateThread = new Thread(() -> {
-			while (true) {
-				try {
-					updateServer();
-					Thread.sleep(10000); // Update every 10 seconds
-				} catch (IOException | InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		});
-		updateThread.start();
 	}
 
     public String[] lookup(String fileName, Socket socket, int count) throws IOException{
@@ -270,17 +259,7 @@ public class Peer {
 		in.close();
 		socket.close();
 	}
-	public void updateServer() throws IOException {
-		Socket socket = new Socket(address, port);
-		DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
-		dOut.writeByte(6); // Option to update the server
-		dOut.writeInt(numFiles);
-		for (String str : fileNames)
-			dOut.writeUTF(str);
-		dOut.flush();
-		dOut.close();
-		socket.close();
-	}
+
     
 }
 

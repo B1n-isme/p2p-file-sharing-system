@@ -23,23 +23,7 @@ public class Client {
     public String[] peerAddress = new String[0];
 	public JButton runClientButton;
 	public JLabel backgroundLabel;
-	// public class BackgroundPanel extends JPanel {
-    // private Image img;
 
-    // public BackgroundPanel(String filename) {
-    //     try {
-    //         img = ImageIO.read(new File(filename));
-    //     } catch (IOException e) {
-    //         e.printStackTrace();
-    //     }
-    // }
-
-    // @Override
-    // protected void paintComponent(Graphics g) {
-    //     super.paintComponent(g);
-    //     g.drawImage(img, 0, 0, getWidth(), getHeight(), this);
-    // }
-// }
 	public JTextField createCustomTextField(String text) {
 		JTextField field = new JTextField();
 		field.addFocusListener(new FocusListener() {
@@ -74,11 +58,8 @@ public class Client {
 		frame.setSize(600, 300);
 		frame.setLocationRelativeTo(null);
 
-		// Set the background image
-		// JFrame frame = new JFrame("Background Image");
-        // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		ImageIcon background = new ImageIcon("C:/Users/ADMIN/Desktop/code/java/DistributedSys/project/Bin/p2p-file-sharing-system/simple-p2p-file-sharing copy/background.jpg"); // Replace with your image path
+		ImageIcon background = new ImageIcon("/Users/binnu/Library/CloudStorage/OneDrive-student.vgu.edu.vn/Semester 6/Distributed System/P2P_PROJECT/p2p-file-sharing-system/simple-p2p-file-sharing copy/background.jpg"); // Replace with your image path
 		backgroundLabel = new JLabel();
 		backgroundLabel.setIcon(background);
 		backgroundLabel.setHorizontalAlignment(JLabel.CENTER);
