@@ -12,7 +12,7 @@ import java.util.HashMap;
 public class Server extends Thread {
 
     private static int peerid = 0;
-    private ArrayList<Peer> peerList;
+    private ArrayList<Peer> peerList = new ArrayList<>();
     private Socket socket;
     private static final HashMap<String, Integer> addressPortToPeerId = new HashMap<>();
 

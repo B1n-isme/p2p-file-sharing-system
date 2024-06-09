@@ -107,21 +107,31 @@ public class Client {
 
         //
     }
-	public class runClientButtonListener implements ActionListener{
+	public class runClientButtonListener implements ActionListener {
+		Timer timer;
+	
 		public void actionPerformed(ActionEvent e) {
 			String folderDirectory = folderDirectoryField.getText();
 			int clientPort = Integer.parseInt(clientPortField.getText());
 			String serverAddress = serverAddressField.getText();
 			int serverPort = Integer.parseInt(serverPortField.getText());
-
+	
 			try {
 				runClient(folderDirectory, clientPort, serverAddress, serverPort);
+				startTimer(); // Start the timer after running the client
 			} catch (IOException ex) {
 				ex.printStackTrace();
 			}
-			
+		}
+	
+		public void startTimer() {
+			if (timer == null) {
+				timer = new Timer(5000, this); // set time
+				timer.start();
+			}
 		}
 	}
+
 
     public void runClient(String folderDirectory, int clientPort, String serverAddress, int serverPort) throws IOException {
         String dir = folderDirectory;

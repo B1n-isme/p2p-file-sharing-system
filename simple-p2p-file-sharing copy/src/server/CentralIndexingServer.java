@@ -71,14 +71,18 @@ public class CentralIndexingServer {
     }
 
     public static void registry(int peerId, int numFiles, ArrayList<String> fileNames, String directory, String address, int port) {
+        Peer newPeer = new Peer(peerId, numFiles, fileNames, directory, address, port);
         for (String fileName : fileNames) {
             if (index.containsKey(fileName)) {
-                index.get(fileName).add(new Peer(peerId, numFiles, fileNames, directory, address, port));
+                // Check if peerId already exists
+                boolean peerExists = index.get(fileName).stream().anyMatch(peer -> peer.getPeerId() == peerId);
+                if (!peerExists) {
+                    index.get(fileName).add(newPeer);
+                }
             } else {
                 index.put(fileName, new ArrayList<Peer>());
-                index.get(fileName).add(new Peer(peerId, numFiles, fileNames, directory, address, port));
+                index.get(fileName).add(newPeer);
             }
-
         }
     }
 
