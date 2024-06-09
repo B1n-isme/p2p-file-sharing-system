@@ -7,18 +7,20 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.HashMap;
 
 public class Server extends Thread {
 
-    private static int id = 0;
+    private static int peerid = 0;
     private ArrayList<Peer> peerList;
     private Socket socket;
+    private static final HashMap<String, Integer> addressPortToPeerId = new HashMap<>();
 
-    private int getUniqueId() {
-        synchronized (this) {
-            return ++id;
-        }
-    }
+    // private int getUniqueId() {
+    //     synchronized (this) {
+    //         return ++id;
+    //     }
+    // }
 
     public void newPeerList() {
         peerList = new ArrayList<Peer>();
@@ -50,10 +52,12 @@ public class Server extends Thread {
             DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
 
             byte option = dIn.readByte();
-			System.out.println("Received request code: " + option);
+			// System.out.println("Received request code: " + option);
             switch (option) {
                 case 0:
-                    int peerId = getUniqueId();
+                    // int peerId = getUniqueId();
+
+                    
 
                     Boolean end = false;
                     ArrayList<String> fileNames = new ArrayList<String>();
@@ -66,9 +70,11 @@ public class Server extends Thread {
                         switch (messageType) {
                             case 1:
                                 numFiles = dIn.readInt();
-                                System.out.println("\nPeer " + peerId + " registering with " + numFiles + " files:");
+                                // System.out.println("\nPeer " + peerId + " registering with " + numFiles + " files:");
+                                // System.out.println(socket.getInetAddress().getHostAddress());
                                 break;
                             case 2:
+                                System.out.println("\nNew peer registering with " + numFiles + " files:");
                                 for (int i = 0; i < numFiles; i++) {
                                     fileNames.add(dIn.readUTF());
                                     System.out.println(fileNames.get(i));
@@ -88,11 +94,30 @@ public class Server extends Thread {
                         }
                     }
 
+                    // Check if the port and address are already in the lists
+					boolean check = false;
+					for (int i = 0; i < CentralIndexingServer.saveAddress.size(); i++){
+						if (CentralIndexingServer.saveAddress.get(i).equals(address) && CentralIndexingServer.savePort.get(i).equals(port)){
+							peerid = i + 1;
+							check = true;
+							break;
+						}
+					}
+
+					if (check == false){
+						CentralIndexingServer.savePort.add(port);
+						CentralIndexingServer.saveAddress.add(address);
+						peerid = CentralIndexingServer.saveAddress.size();
+					}
+
+					System.out.println("\nPeer ID: " + peerid + ", Address: " + address + ", Port: " + port);
+					System.out.println("----------------------------------");
+
                     synchronized (this) {
-                        CentralIndexingServer.registry(peerId, numFiles, fileNames, directory, address, port);
+                        CentralIndexingServer.registry(peerid, numFiles, fileNames, directory, address, port);
                     }
 
-                    dOut.writeInt(peerId);
+                    dOut.writeInt(peerid);
                     dOut.flush();
                     socket.close();
                     break;

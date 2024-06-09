@@ -19,6 +19,8 @@ public class CentralIndexingServer {
     private static int numThreads = 4;
     private static PeerQueue<Socket> peerQueue;
 
+    protected static ArrayList<Integer> savePort = new ArrayList<>();
+	protected static ArrayList<String> saveAddress = new ArrayList<>();
     public static Hashtable<String, ArrayList<Peer>> getIndex() {
         return index;
     }
