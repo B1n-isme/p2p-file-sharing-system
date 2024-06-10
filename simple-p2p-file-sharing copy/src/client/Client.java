@@ -208,8 +208,8 @@ public class Client {
 
                         if (kind == StandardWatchEventKinds.ENTRY_CREATE || kind == StandardWatchEventKinds.ENTRY_DELETE || kind == StandardWatchEventKinds.ENTRY_MODIFY) {
                             // Run peer.register(socket) here
-                            Socket socket2 = new Socket(serverAddress, serverPort);
-                            peer.register(socket2);
+                            // Socket socket2 = new Socket(serverAddress, serverPort);
+                            peer.register(socket);
                         }
                     }
 
@@ -222,6 +222,16 @@ public class Client {
                 System.err.println(ex);
             }
         }).start();
+
+        new Thread() {
+            public void run() {
+                try {
+                    peer.server();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
 
         new Thread() {
             public void run() {
