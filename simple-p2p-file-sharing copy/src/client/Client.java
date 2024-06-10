@@ -207,9 +207,11 @@ public class Client {
                         System.out.println(kind.name() + ": " + fileName);
 
                         if (kind == StandardWatchEventKinds.ENTRY_CREATE || kind == StandardWatchEventKinds.ENTRY_DELETE || kind == StandardWatchEventKinds.ENTRY_MODIFY) {
-                            // Run peer.register(socket) here
-                            // Socket socket2 = new Socket(serverAddress, serverPort);
-                            peer.register(socket);
+                            try {
+								runClient(folderDirectory, clientPort, serverAddress, serverPort);
+							} catch (IOException e) {
+								System.err.println("Failed to register peer: " + e);
+							}
                         }
                     }
 
@@ -380,6 +382,7 @@ public class Client {
 				System.out.println("Peer disconnected!");
 				try {
 					peer.disconnect(new Socket(serverAddressField.getText(), Integer.parseInt(serverPortField.getText())));
+					System.exit(0);
 				} catch (IOException ex) {
 					ex.printStackTrace();
 				}

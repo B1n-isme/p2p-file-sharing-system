@@ -1,6 +1,12 @@
 package server;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Peer {
 	private int peerId;
@@ -84,5 +90,16 @@ public class Peer {
 		}
 		return false;
 	}
+	public void refreshFileList() {
+        try (Stream<Path> paths = Files.walk(Paths.get(directory))) {
+            fileNames = paths
+                .filter(Files::isRegularFile)
+                .map(Path::getFileName)
+                .map(Path::toString)
+                .collect(Collectors.toCollection(ArrayList::new));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 }

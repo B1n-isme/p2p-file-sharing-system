@@ -21,6 +21,7 @@ public class CentralIndexingServer {
 
     protected static ArrayList<Integer> savePort = new ArrayList<>();
 	protected static ArrayList<String> saveAddress = new ArrayList<>();
+    protected static ArrayList<ArrayList<String>> saveFileNames = new ArrayList<>();
     public static Hashtable<String, ArrayList<Peer>> getIndex() {
         return index;
     }

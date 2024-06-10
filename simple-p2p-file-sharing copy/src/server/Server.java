@@ -100,6 +100,11 @@ public class Server extends Thread {
 						if (CentralIndexingServer.saveAddress.get(i).equals(address) && CentralIndexingServer.savePort.get(i).equals(port)){
 							peerid = i + 1;
 							check = true;
+
+                            // clear the file names from the list
+                            // CentralIndexingServer.saveFileNames.get(i).clear();
+                            // CentralIndexingServer.saveFileNames.get(i).addAll(fileNames);
+                            
 							break;
 						}
 					}
@@ -108,7 +113,7 @@ public class Server extends Thread {
 						CentralIndexingServer.savePort.add(port);
 						CentralIndexingServer.saveAddress.add(address);
 						peerid = CentralIndexingServer.saveAddress.size();
-					}
+					} 
 
 					System.out.println("\nPeer ID: " + peerid + ", Address: " + address + ", Port: " + port);
 					System.out.println("----------------------------------");
@@ -148,22 +153,41 @@ public class Server extends Thread {
                     socket.close();
                     break;
 
+                // case 2: // Handle "LIST_FILES" request
+				// 	Set<Peer> allPeers = CentralIndexingServer.getAllPeers();
+				// 	Set<String> allFileNames = new HashSet<>(); // Use a HashSet to avoid duplicates
+
+				// 	for (Peer p : allPeers) {
+				// 		allFileNames.addAll(p.getFileNames()); // AddAll still works fine with Sets
+				// 	}
+
+				// 	dOut.writeInt(allFileNames.size()); // Send the number of unique files
+				// 	dOut.flush();
+				// 	for (String file : allFileNames) {
+				// 		dOut.writeUTF(file); // Send each unique file name
+				// 		dOut.flush();
+				// 	}
+				// 	socket.close();
+				// 	break;
+                
                 case 2: // Handle "LIST_FILES" request
-					Set<Peer> allPeers = CentralIndexingServer.getAllPeers();
-					Set<String> allFileNames = new HashSet<>(); // Use a HashSet to avoid duplicates
+                    Set<Peer> allPeers = CentralIndexingServer.getAllPeers();
+                    Set<String> allFileNames = new HashSet<>(); // Use a HashSet to avoid duplicates
 
-					for (Peer p : allPeers) {
-						allFileNames.addAll(p.getFileNames()); // AddAll still works fine with Sets
-					}
+                    for (Peer p : allPeers) {
+                        // Refresh the file list from the peer
+                        p.refreshFileList();
+                        allFileNames.addAll(p.getFileNames()); // AddAll still works fine with Sets
+                    }
 
-					dOut.writeInt(allFileNames.size()); // Send the number of unique files
-					dOut.flush();
-					for (String file : allFileNames) {
-						dOut.writeUTF(file); // Send each unique file name
-						dOut.flush();
-					}
-					socket.close();
-					break;
+                    dOut.writeInt(allFileNames.size()); // Send the number of unique files
+                    dOut.flush();
+                    for (String file : allFileNames) {
+                        dOut.writeUTF(file); // Send each unique file name
+                        dOut.flush();
+                    }
+                    socket.close();
+                    break;
 
                 case 3:
                     String message = dIn.readUTF();
