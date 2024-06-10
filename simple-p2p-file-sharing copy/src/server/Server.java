@@ -165,6 +165,15 @@ public class Server extends Thread {
 					socket.close();
 					break;
 
+                case 3:
+                    String message = dIn.readUTF();
+
+                    if (message.startsWith("DISCONNECT ")) {
+                        String peerId = message.substring(11); // Get the peerId from the message
+                        System.out.println("Peer " + peerId + " has disconnected");
+
+                    }
+                    break;
                 default:
                     System.out.println("Not an option");
             }

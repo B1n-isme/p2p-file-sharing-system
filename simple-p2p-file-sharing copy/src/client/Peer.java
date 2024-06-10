@@ -292,6 +292,21 @@ public class Peer {
 	
 		return fileNames; // Return the list of file names
 	}
+
+    public void disconnect(Socket socket) throws IOException {
+		DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
+		// DataInputStream dIn = new DataInputStream(socket.getInputStream());
+        try {
+            dOut.writeByte(3);
+            dOut.flush();
+
+			dOut.writeUTF("DISCONNECT " + this.peerId);
+            dOut.flush();
+        } catch (IOException e) {
+            System.out.println("Error while disconnecting: " + e.getMessage());
+        }
+		dOut.close();
+    }
 }
 
 	

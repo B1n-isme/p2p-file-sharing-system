@@ -378,7 +378,11 @@ public class Client {
 		exitButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("Peer disconnected!");
-				System.exit(0);
+				try {
+					peer.disconnect(new Socket(serverAddressField.getText(), Integer.parseInt(serverPortField.getText())));
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
 			}
 		});
 
