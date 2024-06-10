@@ -138,6 +138,7 @@ public class Peer {
 		socket.close();
 
 		System.out.println("Running as Peer " + peerId + "! " + "It Took " + (System.currentTimeMillis() - start) + "ms for register.");
+		
     	//System.out.println("Took " + (System.currentTimeMillis() - start) + " ms to register in the server.");
     	//System.out.println((System.currentTimeMillis() - start) + " ms");
     	// if(BenchRegistry.times != null) BenchRegistry.times.add((System.currentTimeMillis() - start));
@@ -173,8 +174,8 @@ public class Peer {
 				}catch (EOFException e){
 					i--;
 				}
-				String paddress[] = peerAddress[i].split(":");
-				System.out.println("Peer " + paddress[2] + " - " + paddress[0] +":" + paddress[1] + " has the file " + fileName + "! - Looked by Peer " + peerId);
+				// String paddress[] = peerAddress[i].split(":");
+				// System.out.println("Peer " + paddress[2] + " - " + paddress[0] +":" + paddress[1] + " has the file " + fileName + "! - Looked by Peer " + peerId);
 			}
 		} else if(found == 0){
 			System.out.println("File not found in the system");
@@ -232,7 +233,8 @@ public class Peer {
 		
 	}
     
-    public void download(String peerAddress, int port, String fileName, int i) throws IOException {
+    public String download(String peerAddress, int port, String fileName, int i) throws IOException {
+		String message = "";
 		Socket socket = new Socket(peerAddress, port);
 		DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
 		dOut.writeUTF(fileName);
@@ -245,7 +247,8 @@ public class Peer {
 			try {
 				created = folder.mkdir();
 			} catch (Exception e) {
-				System.out.println("Couldn't create the folder, the file will be saved in the current directory!");
+				// System.out.println("Couldn't create the folder, the file will be saved in the current directory!");
+				message = "Couldn't create the folder, the file will be saved in the current directory!";
 			}
 		} else {
 			created = true;
@@ -257,33 +260,15 @@ public class Peer {
 	
 		OutputStream out = (created) ? new FileOutputStream(peerDirectory + "/" + fileName) : new FileOutputStream(fileName);
 		Util.copy(in, out);
-		System.out.println("File " + fileName + " received from peer " + peerAddress + ":" + port);
+		// System.out.println("File " + fileName + " received from peer " + peerAddress + ":" + port);
+		message = "File " + fileName + " received from peer " + peerAddress + ":" + port;
 		dOut.close();
 		out.close();
 		in.close();
 		socket.close();
+		return message;
 	}
 
-	// public List<String> listServerFiles(Socket socket) throws IOException {
-	// 	List<String> fileList = new ArrayList<>();
-		
-	// 	DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
-		
-	// 	dOut.writeByte(2);
-	// 	dOut.flush();
-		
-	// 	// int numFiles = dIn.readInt();
-		
-	// 	// for (int i = 0; i < numFiles; i++) {
-	// 	// 	String fileName = dIn.readUTF();
-	// 	// 	fileList.add(fileName);
-	// 	// }
-		
-	// 	dOut.close();
-	// 	socket.close();
-		
-	// 	return fileList;
-	// }
 	public List<String> listServerFiles(Socket socket) throws IOException {
 		DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
 		DataInputStream dIn = new DataInputStream(socket.getInputStream());

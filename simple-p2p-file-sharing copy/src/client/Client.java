@@ -4,8 +4,15 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.ArrayList;
-
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -107,9 +114,32 @@ public class Client {
 
         //
     }
-	public class runClientButtonListener implements ActionListener {
-		Timer timer;
+	// public class runClientButtonListener implements ActionListener {
+	// 	Timer timer;
 	
+	// 	public void actionPerformed(ActionEvent e) {
+	// 		String folderDirectory = folderDirectoryField.getText();
+	// 		int clientPort = Integer.parseInt(clientPortField.getText());
+	// 		String serverAddress = serverAddressField.getText();
+	// 		int serverPort = Integer.parseInt(serverPortField.getText());
+	
+	// 		try {
+	// 			runClient(folderDirectory, clientPort, serverAddress, serverPort);
+	// 			startTimer(); // Start the timer after running the client
+	// 		} catch (IOException ex) {
+	// 			ex.printStackTrace();
+	// 		}
+	// 	}
+	
+	// 	public void startTimer() {
+	// 		if (timer == null) {
+	// 			timer = new Timer(5000, this); // set time
+	// 			timer.start();
+	// 		}
+	// 	}
+	// }
+	public class runClientButtonListener implements ActionListener {
+
 		public void actionPerformed(ActionEvent e) {
 			String folderDirectory = folderDirectoryField.getText();
 			int clientPort = Integer.parseInt(clientPortField.getText());
@@ -118,21 +148,17 @@ public class Client {
 	
 			try {
 				runClient(folderDirectory, clientPort, serverAddress, serverPort);
-				startTimer(); // Start the timer after running the client
+				// startTimer(); // Start the timer after running the client
 			} catch (IOException ex) {
 				ex.printStackTrace();
 			}
 		}
 	
-		public void startTimer() {
-			if (timer == null) {
-				timer = new Timer(5000, this); // set time
-				timer.start();
-			}
-		}
+
 	}
+	
 
-
+	int count = 0;
     public void runClient(String folderDirectory, int clientPort, String serverAddress, int serverPort) throws IOException {
         String dir = folderDirectory;
         File folder = new File(dir);
@@ -146,15 +172,56 @@ public class Client {
         Socket socket = new Socket(serverAddress, serverPort);
         peer.register(socket);
 
-        new Thread() {
-            public void run() {
-                try {
-                    peer.server();
-                } catch (IOException e) {
-                    e.printStackTrace();
+		int peerId = peer.getPeerId();
+
+		if (count == 0){
+			JOptionPane.showMessageDialog(null, "Peer " + peerId + " is registered");
+		}
+		count++;
+
+		new Thread(() -> {
+            try {
+                WatchService watcher = FileSystems.getDefault().newWatchService();
+                Path dir1 = Paths.get(dir);
+                dir1.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
+
+                while (true) {
+                    WatchKey key;
+                    try {
+                        key = watcher.take();
+                    } catch (InterruptedException ex) {
+                        return;
+                    }
+
+                    for (WatchEvent<?> event : key.pollEvents()) {
+                        WatchEvent.Kind<?> kind = event.kind();
+
+                        if (kind == StandardWatchEventKinds.OVERFLOW) {
+                            continue;
+                        }
+
+                        // The filename is the context of the event.
+                        WatchEvent<Path> ev = (WatchEvent<Path>) event;
+                        Path fileName = ev.context();
+
+                        System.out.println(kind.name() + ": " + fileName);
+
+                        if (kind == StandardWatchEventKinds.ENTRY_CREATE || kind == StandardWatchEventKinds.ENTRY_DELETE || kind == StandardWatchEventKinds.ENTRY_MODIFY) {
+                            // Run peer.register(socket) here
+                            Socket socket2 = new Socket(serverAddress, serverPort);
+                            peer.register(socket2);
+                        }
+                    }
+
+                    boolean valid = key.reset();
+                    if (!valid) {
+                        break;
+                    }
                 }
+            } catch (IOException ex) {
+                System.err.println(ex);
             }
-        }.start();
+        }).start();
 
         new Thread() {
             public void run() {
@@ -201,7 +268,24 @@ public class Client {
 						try {
 							peerAddress = peer.lookup(fileName, new Socket(serverAddressField.getText(), Integer.parseInt(serverPortField.getText())), 1);
 							// Display the lookup result
-							System.out.println("Lookup result: " + peerAddress);
+							StringBuilder message = new StringBuilder();
+
+							// for (String peerAdd : peerAddress){
+							// 	String paddress[] = peerAdd.split(":");
+							// 	message.append("Peer " + paddress[2] + " - " + paddress[0] +":" + paddress[1] + " has the file " + fileName + "! - Looked by Peer " + peerId + "\n");
+							// }
+							if(peerAddress.length == 0) {
+								message.append("File not found on any peer.");
+							} else {
+								message.append("File found on peer(s): ");
+								for (String addr : peerAddress) {
+									String paddress[] = addr.split(":");
+									message.append(paddress[2] + ", ");
+								}
+								message.delete(message.length() - 2, message.length());
+							}
+							JOptionPane.showMessageDialog(null, message.toString());
+							// System.out.println("Lookup result: " + Arrays.toString(peerAddress));
 						} catch (IOException ex) {
 							ex.printStackTrace();
 						}
@@ -240,7 +324,8 @@ public class Client {
 					if (selectedPeer != null) {
 						String[] addrport = selectedPeer.split(":");
 						try {
-							peer.download(addrport[0], Integer.parseInt(addrport[1]), fileName, -1);
+							String message = peer.download(addrport[0], Integer.parseInt(addrport[1]), fileName, -1);
+							JOptionPane.showMessageDialog(null, message);
 						} catch (IOException ex) {
 							ex.printStackTrace();
 						}
