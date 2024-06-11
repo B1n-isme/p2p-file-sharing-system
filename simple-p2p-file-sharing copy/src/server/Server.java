@@ -138,9 +138,9 @@ public class Server extends Thread {
                 case 1:
                     String fileName = dIn.readUTF();
                     Set<Peer> allPeers = CentralIndexingServer.getAllPeers();
-                    for (Peer p : allPeers) {
-                        p.refreshFileList();
-                    }
+                    // for (Peer p : allPeers) {
+                    //     p.refreshFileList();
+                    // }
                     Boolean b = search(fileName);
 
                     try {
