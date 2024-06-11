@@ -281,7 +281,8 @@ public class Peer {
 			message = Util.copy(in, out);
 			System.out.println(message);
 		} catch (IOException e) {
-			System.err.println("Error during file transfer: " + e.getMessage());
+			// System.err.println("Error during file transfer: " + e.getMessage());
+			message = "Error during file transfer: " + e.getMessage();
 			// Handle the error (e.g., by retrying the download, notifying the user, etc.)
 		}
 		dOut.close();
