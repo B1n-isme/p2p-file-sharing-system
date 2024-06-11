@@ -265,17 +265,24 @@ public class Peer {
 	
 		OutputStream out = (created) ? new FileOutputStream(peerDirectory + "/" + fileName) : new FileOutputStream(fileName);
 
-		message = Util.copy(in, out);
-		// System.out.println("File " + fileName + " received from peer " + peerAddress + ":" + port);
-		// message += "File " + fileName + " received from peer " + peerAddress + ":" + port;
-		// Check if Util.copy() returned an error message
-		if (message.contains("Can't continue download file")) {
-			// System.out.println("Peer " + peerId + " disconnected while downloading file " + fileName);
-			message += "Peer " + peerId + " disconnected while downloading file " + fileName;
-		}
-		else {
-			// System.out.println("File " + fileName + " received from peer " + peerAddress + ":" + port);
-			message += "File " + fileName + " received from peer " + peerAddress + ":" + port;
+		// message = Util.copy(in, out);
+		// // System.out.println("File " + fileName + " received from peer " + peerAddress + ":" + port);
+		// // message += "File " + fileName + " received from peer " + peerAddress + ":" + port;
+		// // Check if Util.copy() returned an error message
+		// if (message.contains("Can't continue download file")) {
+		// 	// System.out.println("Peer " + peerId + " disconnected while downloading file " + fileName);
+		// 	message += "Peer " + peerId + " disconnected while downloading file " + fileName;
+		// }
+		// else {
+		// 	// System.out.println("File " + fileName + " received from peer " + peerAddress + ":" + port);
+		// 	message += "File " + fileName + " received from peer " + peerAddress + ":" + port;
+		// }
+		try {
+			message = Util.copy(in, out);
+			System.out.println(message);
+		} catch (IOException e) {
+			System.err.println("Error during file transfer: " + e.getMessage());
+			// Handle the error (e.g., by retrying the download, notifying the user, etc.)
 		}
 		dOut.close();
 		out.close();
