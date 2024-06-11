@@ -75,10 +75,10 @@ public class FakeClient {
 
     public static void main(String[] args) {
         // Number of fake clients to simulate
-        int numberOfClients = 100;
+        int numberOfClients = 500;
 
         // Parameters for the fake clients
-        String serverAddress = "172.16.129.237";
+        String serverAddress = "172.16.133.108";
         int serverPort = 3434;
 
         Random random = new Random();

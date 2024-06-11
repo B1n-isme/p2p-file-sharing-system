@@ -2,6 +2,7 @@ package server;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -102,9 +103,12 @@ public class Peer {
                 .map(Path::getFileName)
                 .map(Path::toString)
                 .collect(Collectors.toCollection(ArrayList::new));
-        } catch (IOException e) {
+        } catch (NoSuchFileException e) {
+			// System.out.println("Directory not found");
+			System.out.println("Files list successfullly");
+		} catch (IOException e) {
             e.printStackTrace();
-        }
+        } 
     }
 
 }

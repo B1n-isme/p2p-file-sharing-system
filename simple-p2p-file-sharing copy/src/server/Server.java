@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -165,21 +166,43 @@ public class Server extends Thread {
                     socket.close();
                     break;
                 
+                // case 2: // Handle "LIST_FILES" request
+                //     Set<Peer> allPeers2 = CentralIndexingServer.getAllPeers();
+                //     Set<String> allFileNames = new HashSet<>(); // Use a HashSet to avoid duplicates
+
+                //     for (Peer p : allPeers2) {
+                //         // Refresh the file list from the peer
+                //         // p.refreshFileList();
+                //         allFileNames.addAll(p.getFileNames()); // AddAll still works fine with Sets
+                //     }
+
+                //     dOut.writeInt(allFileNames.size()); // Send the number of unique files
+                //     dOut.flush();
+                //     for (String file : allFileNames) {
+                //         dOut.writeUTF(file); // Send each unique file name
+                //         dOut.flush();
+                //     }
+                //     socket.close();
+                //     break;
+
                 case 2: // Handle "LIST_FILES" request
                     Set<Peer> allPeers2 = CentralIndexingServer.getAllPeers();
                     Set<String> allFileNames = new HashSet<>(); // Use a HashSet to avoid duplicates
 
                     for (Peer p : allPeers2) {
-                        // Refresh the file list from the peer
                         p.refreshFileList();
-                        allFileNames.addAll(p.getFileNames()); // AddAll still works fine with Sets
+                        allFileNames.addAll(p.getFileNames());
                     }
 
-                    dOut.writeInt(allFileNames.size()); // Send the number of unique files
-                    dOut.flush();
-                    for (String file : allFileNames) {
-                        dOut.writeUTF(file); // Send each unique file name
+                    try {
+                        dOut.writeInt(allFileNames.size()); // Send the number of unique files
                         dOut.flush();
+                        for (String file : allFileNames) {
+                            dOut.writeUTF(file); // Send each unique file name
+                            dOut.flush();
+                        }
+                    } catch (IOException e) {
+                        System.err.println("An I/O error occurred while sending file list: " + e.getMessage());
                     }
                     socket.close();
                     break;
@@ -193,33 +216,6 @@ public class Server extends Thread {
 
                     }
                     break;
-                // case 4:
-                //     int peerId = dIn.readInt(); // Read the peerId from the client
-                //     Peer peer = null; // Initialize the peer variable
-                //     int size = dIn.readInt(); // Read the number of files to delete
-                //     // Iterate over all peers in the index
-                //     for (ArrayList<Peer> peers : CentralIndexingServer.getIndex().values()) {
-                //         for (Peer p : peers) {
-                //             if (p.getPeerId() == peerId) {
-                //                 peer = p; // If the peerId matches, assign the peer and break the loop
-                //                 break;
-                //             }
-                //         }
-                //         if (peer != null) {
-                //             break;
-                //         }
-                //     }
-                //     for(int i = 0 ; i < size ; i++) { // While there are more bytes to read
-                //         String deletedFileName = dIn.readUTF(); // Read the deleted file name
-                //         // Remove the deleted file from the peer's file list
-                //         boolean isRemoved = peer.removeFile(deletedFileName);
-                //         if (isRemoved) {
-                //             System.out.println("File " + deletedFileName + " has been deleted from peer " + peerId + ".");
-                //         } else {
-                //             System.out.println("File " + deletedFileName + " not found in peer " + peerId + ".");
-                //         }
-                //     }
-                //     break;
                 case 4:
                     int peerId = dIn.readInt(); // Read the peerId from the client
                     Peer peer = null; // Initialize the peer variable

@@ -282,12 +282,13 @@ public class Client {
 							if(peerAddress.length == 0) {
 								message.append("File not found on any peer.");
 							} else {
-								message.append("File found on peer(s): ");
-								for (String addr : peerAddress) {
-									String paddress[] = addr.split(":");
-									message.append(paddress[2] + ", ");
-								}
-								message.delete(message.length() - 2, message.length());
+								// message.append("File found on peer(s): ");
+								// for (String addr : peerAddress) {
+								// 	String paddress[] = addr.split(":");
+								// 	message.append(paddress[2] + ", ");
+								// }
+								// message.delete(message.length() - 2, message.length());
+								message.append("File found!!!");
 							}
 							JOptionPane.showMessageDialog(null, message.toString());
 							// System.out.println("Lookup result: " + Arrays.toString(peerAddress));
