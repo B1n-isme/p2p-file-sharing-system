@@ -114,30 +114,6 @@ public class Client {
 
         //
     }
-	// public class runClientButtonListener implements ActionListener {
-	// 	Timer timer;
-	
-	// 	public void actionPerformed(ActionEvent e) {
-	// 		String folderDirectory = folderDirectoryField.getText();
-	// 		int clientPort = Integer.parseInt(clientPortField.getText());
-	// 		String serverAddress = serverAddressField.getText();
-	// 		int serverPort = Integer.parseInt(serverPortField.getText());
-	
-	// 		try {
-	// 			runClient(folderDirectory, clientPort, serverAddress, serverPort);
-	// 			startTimer(); // Start the timer after running the client
-	// 		} catch (IOException ex) {
-	// 			ex.printStackTrace();
-	// 		}
-	// 	}
-	
-	// 	public void startTimer() {
-	// 		if (timer == null) {
-	// 			timer = new Timer(5000, this); // set time
-	// 			timer.start();
-	// 		}
-	// 	}
-	// }
 	public class runClientButtonListener implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
@@ -159,6 +135,7 @@ public class Client {
 	
 
 	int count = 0;
+	private List<String> deletedFiles = new ArrayList<>();
     public void runClient(String folderDirectory, int clientPort, String serverAddress, int serverPort) throws IOException {
         String dir = folderDirectory;
         File folder = new File(dir);
@@ -166,6 +143,7 @@ public class Client {
 
 		//get all file names in folder
         ArrayList<String> fileNames = Util.listFilesForFolder(folder);
+
 
         final Peer peer = new Peer(dir, fileNames, fileNames.size(), address, clientPort);
 
@@ -206,14 +184,29 @@ public class Client {
 
                         System.out.println(kind.name() + ": " + fileName);
 
+						// if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
+                        //     deletedFiles.add(fileName.toString()); // Add this line to store the deleted file name
+
+                        // }
+
                         if (kind == StandardWatchEventKinds.ENTRY_CREATE || kind == StandardWatchEventKinds.ENTRY_DELETE || kind == StandardWatchEventKinds.ENTRY_MODIFY) {
                             try {
 								runClient(folderDirectory, clientPort, serverAddress, serverPort);
+								Socket newSocket = new Socket(serverAddress, serverPort);
+								peer.notifyFileDeletion(deletedFiles, newSocket);
 							} catch (IOException e) {
 								System.err.println("Failed to register peer: " + e);
 							}
                         }
                     }
+
+					// run nofityFileDeletion with new socket
+					// try {
+					// 	Socket newSocket = new Socket(serverAddress, serverPort);
+					// 	peer.notifyFileDeletion(deletedFiles, newSocket);
+					// } catch (IOException e) {
+					// 	System.err.println("Failed to notify server of file deletion: " + e);
+					// }
 
                     boolean valid = key.reset();
                     if (!valid) {
@@ -312,15 +305,23 @@ public class Client {
 		downloadButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String fileName = fileNameField.getText();
+				String message = "";
+				String inputDirectory = "";
 				if (peerAddress.length == 0) {
 					System.out.println("Lookup for the peer first.");
 				} else if (peerAddress.length == 1 && Integer.parseInt(peerAddress[0].split(":")[2]) == peer.getPeerId()) {
-					System.out.println("This peer has the file already, not downloading then.");
+					JOptionPane.showMessageDialog(null, "This peer has the file already, not downloading then.");
 				} else if (peerAddress.length == 1) {
 					String[] addrport = peerAddress[0].split(":");
-					System.out.println("Downloading from peer " + addrport[2] + ": " + addrport[0] + ":" + addrport[1]);
+					JOptionPane.showMessageDialog(null, "Downloading from peer " + addrport[2] + ": " + addrport[0] + ":" + addrport[1]);
 					try {
-						peer.download(addrport[0], Integer.parseInt(addrport[1]), fileName, -1);
+						inputDirectory = JOptionPane.showInputDialog("Enter the directory to saved the file to:");
+						if (inputDirectory == null || inputDirectory.trim().isEmpty()) {
+							JOptionPane.showMessageDialog(null, "No directory entered. Download cancelled.");
+							return;
+						}
+						message = peer.download(addrport[0], Integer.parseInt(addrport[1]), fileName, -1, inputDirectory);
+						JOptionPane.showMessageDialog(null, message);
 					} catch (IOException ex) {
 						ex.printStackTrace();
 					}
@@ -336,7 +337,12 @@ public class Client {
 					if (selectedPeer != null) {
 						String[] addrport = selectedPeer.split(":");
 						try {
-							String message = peer.download(addrport[0], Integer.parseInt(addrport[1]), fileName, -1);
+							inputDirectory = JOptionPane.showInputDialog("Enter the directory to saved the file to:");
+							if (inputDirectory == null || inputDirectory.trim().isEmpty()) {
+								JOptionPane.showMessageDialog(null, "No directory entered. Download cancelled.");
+								return;
+							}
+							message = peer.download(addrport[0], Integer.parseInt(addrport[1]), fileName, -1, inputDirectory);
 							JOptionPane.showMessageDialog(null, message);
 						} catch (IOException ex) {
 							ex.printStackTrace();

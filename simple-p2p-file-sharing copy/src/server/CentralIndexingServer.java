@@ -49,6 +49,35 @@ public class CentralIndexingServer {
         }
 
     }
+    public static void addFile(Peer peer, String fileName) {
+        if (index.containsKey(fileName)) {
+            index.get(fileName).add(peer);
+        } else {
+            ArrayList<Peer> newPeerList = new ArrayList<>();
+            newPeerList.add(peer);
+            index.put(fileName, newPeerList);
+        }
+    }
+    public static void removeFile(Peer peer, String fileName) {
+        if (index.containsKey(fileName)) {
+            index.get(fileName).remove(peer);
+            if (index.get(fileName).isEmpty()) {
+                index.remove(fileName);
+            }
+        }
+    }
+
+    public static void updateIndex(Peer modifiedPeer) {
+        // Remove all files of the modified peer from the index
+        for (ArrayList<Peer> peers : index.values()) {
+            peers.removeIf(peer -> peer.equals(modifiedPeer));
+        }
+
+        // Re-add all files of the modified peer to the index
+        for (String fileName : modifiedPeer.getFileNames()) {
+            addFile(modifiedPeer, fileName);
+        }
+    }
 
     private static void income() throws IOException {
 

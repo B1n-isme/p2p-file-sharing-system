@@ -38,7 +38,12 @@ public class Peer {
 	public ArrayList<String> getFileNames(){
 		return fileNames;
 	}
-	
+	// public boolean removeFile(String fileName) {
+	// 	System.out.println("Before removal: " + fileNames);
+	// 	boolean isRemoved = fileNames.remove(fileName);
+	// 	System.out.println("After removal: " + fileNames);
+	// 	return isRemoved;
+	// }
 	public String getDirectory(){
 		return directory;
 	}

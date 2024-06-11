@@ -21,11 +21,12 @@ public class Server extends Thread{
 	
 	public void run(){
 		try{
+			String message = "";
 	        DataInputStream dIn = new DataInputStream(socket.getInputStream());
 	        String fileName = dIn.readUTF();
 	        InputStream in = new FileInputStream(directory + "/" + fileName);
 	        OutputStream out = socket.getOutputStream();
-	        Util.copy(in, out);
+	        message = Util.copy(in, out);
 	        dIn.close();
 	        out.close();
 	        in.close();

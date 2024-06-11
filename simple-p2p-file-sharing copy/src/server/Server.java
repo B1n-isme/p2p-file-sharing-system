@@ -45,6 +45,14 @@ public class Server extends Thread {
                 ? addAllPeer(CentralIndexingServer.getIndex().get(fileName))
                 : false;
     }
+    // public Peer findPeerById(int peerId) {
+    //     for (Peer peer : peerList) { // assuming 'peers' is your list of Peer objects
+    //         if (Integer.valueOf(peer.getPeerId()).equals(peerId)) {
+    //             return peer;
+    //         }
+    //     }
+    //     return null;
+    // }
 
     public void run() {
         try {
@@ -129,6 +137,10 @@ public class Server extends Thread {
 
                 case 1:
                     String fileName = dIn.readUTF();
+                    Set<Peer> allPeers = CentralIndexingServer.getAllPeers();
+                    for (Peer p : allPeers) {
+                        p.refreshFileList();
+                    }
                     Boolean b = search(fileName);
 
                     try {
@@ -152,29 +164,12 @@ public class Server extends Thread {
                     }
                     socket.close();
                     break;
-
-                // case 2: // Handle "LIST_FILES" request
-				// 	Set<Peer> allPeers = CentralIndexingServer.getAllPeers();
-				// 	Set<String> allFileNames = new HashSet<>(); // Use a HashSet to avoid duplicates
-
-				// 	for (Peer p : allPeers) {
-				// 		allFileNames.addAll(p.getFileNames()); // AddAll still works fine with Sets
-				// 	}
-
-				// 	dOut.writeInt(allFileNames.size()); // Send the number of unique files
-				// 	dOut.flush();
-				// 	for (String file : allFileNames) {
-				// 		dOut.writeUTF(file); // Send each unique file name
-				// 		dOut.flush();
-				// 	}
-				// 	socket.close();
-				// 	break;
                 
                 case 2: // Handle "LIST_FILES" request
-                    Set<Peer> allPeers = CentralIndexingServer.getAllPeers();
+                    Set<Peer> allPeers2 = CentralIndexingServer.getAllPeers();
                     Set<String> allFileNames = new HashSet<>(); // Use a HashSet to avoid duplicates
 
-                    for (Peer p : allPeers) {
+                    for (Peer p : allPeers2) {
                         // Refresh the file list from the peer
                         p.refreshFileList();
                         allFileNames.addAll(p.getFileNames()); // AddAll still works fine with Sets
@@ -198,8 +193,59 @@ public class Server extends Thread {
 
                     }
                     break;
+                // case 4:
+                //     int peerId = dIn.readInt(); // Read the peerId from the client
+                //     Peer peer = null; // Initialize the peer variable
+                //     int size = dIn.readInt(); // Read the number of files to delete
+                //     // Iterate over all peers in the index
+                //     for (ArrayList<Peer> peers : CentralIndexingServer.getIndex().values()) {
+                //         for (Peer p : peers) {
+                //             if (p.getPeerId() == peerId) {
+                //                 peer = p; // If the peerId matches, assign the peer and break the loop
+                //                 break;
+                //             }
+                //         }
+                //         if (peer != null) {
+                //             break;
+                //         }
+                //     }
+                //     for(int i = 0 ; i < size ; i++) { // While there are more bytes to read
+                //         String deletedFileName = dIn.readUTF(); // Read the deleted file name
+                //         // Remove the deleted file from the peer's file list
+                //         boolean isRemoved = peer.removeFile(deletedFileName);
+                //         if (isRemoved) {
+                //             System.out.println("File " + deletedFileName + " has been deleted from peer " + peerId + ".");
+                //         } else {
+                //             System.out.println("File " + deletedFileName + " not found in peer " + peerId + ".");
+                //         }
+                //     }
+                //     break;
+                case 4:
+                    int peerId = dIn.readInt(); // Read the peerId from the client
+                    Peer peer = null; // Initialize the peer variable
+                    int size = dIn.readInt(); // Read the number of files to delete
+                    // Iterate over all peers in the index
+                    for (ArrayList<Peer> peers : CentralIndexingServer.getIndex().values()) {
+                        for (Peer p : peers) {
+                            if (p.getPeerId() == peerId) {
+                                peer = p; // If the peerId matches, assign the peer and break the loop
+                                break;
+                            }
+                        }
+                        if (peer != null) {
+                            break;
+                        }
+                    }
+                    CentralIndexingServer.updateIndex(peer);
+                    break;
                 default:
                     System.out.println("Not an option");
+
+                // close stream
+                dIn.close();
+                dOut.close();
+                socket.close();
+
             }
 
         } catch (IOException ioe) {

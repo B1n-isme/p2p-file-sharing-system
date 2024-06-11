@@ -238,14 +238,14 @@ public class Peer {
 		
 	}
     
-    public String download(String peerAddress, int port, String fileName, int i) throws IOException {
+    public String download(String peerAddress, int port, String fileName, int i, String inputdirectory) throws IOException {
 		String message = "";
 		Socket socket = new Socket(peerAddress, port);
 		DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
 		dOut.writeUTF(fileName);
 		InputStream in = socket.getInputStream();
 	
-		String peerDirectory = directory;
+		String peerDirectory = inputdirectory;
 		File folder = new File(peerDirectory);
 		Boolean created = false;
 		if (!folder.exists()) {
@@ -264,9 +264,19 @@ public class Peer {
 		}
 	
 		OutputStream out = (created) ? new FileOutputStream(peerDirectory + "/" + fileName) : new FileOutputStream(fileName);
-		Util.copy(in, out);
+
+		message = Util.copy(in, out);
 		// System.out.println("File " + fileName + " received from peer " + peerAddress + ":" + port);
-		message = "File " + fileName + " received from peer " + peerAddress + ":" + port;
+		// message += "File " + fileName + " received from peer " + peerAddress + ":" + port;
+		// Check if Util.copy() returned an error message
+		if (message.contains("Can't continue download file")) {
+			// System.out.println("Peer " + peerId + " disconnected while downloading file " + fileName);
+			message += "Peer " + peerId + " disconnected while downloading file " + fileName;
+		}
+		else {
+			// System.out.println("File " + fileName + " received from peer " + peerAddress + ":" + port);
+			message += "File " + fileName + " received from peer " + peerAddress + ":" + port;
+		}
 		dOut.close();
 		out.close();
 		in.close();
@@ -312,6 +322,27 @@ public class Peer {
         }
 		dOut.close();
     }
+	public void notifyFileDeletion(List<String> fileNames, Socket socket) throws IOException {
+		DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
+		try {
+			dOut.writeByte(4); // 4 is the code for file deletion
+			dOut.flush();
+			dOut.writeInt(this.peerId); // send the peerId
+			dOut.flush();
+			// send file names length
+			dOut.writeInt(fileNames.size());
+			dOut.flush();
+			for (String fileName : fileNames) {
+				dOut.writeUTF(fileName); // the name of the deleted file
+				dOut.flush();
+
+			}
+		} catch (IOException e) {
+			System.out.println("Error while notifying file deletion: " + e.getMessage());
+		} finally {
+			dOut.close();
+		}
+	}
 
 }
 
