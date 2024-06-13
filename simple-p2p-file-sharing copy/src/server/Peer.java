@@ -105,7 +105,7 @@ public class Peer {
                 .collect(Collectors.toCollection(ArrayList::new));
         } catch (NoSuchFileException e) {
 			// System.out.println("Directory not found");
-			System.out.println("Files list successfullly");
+			System.out.println("");
 		} catch (IOException e) {
             e.printStackTrace();
         } 
