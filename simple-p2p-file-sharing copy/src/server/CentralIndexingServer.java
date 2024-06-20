@@ -67,7 +67,7 @@ public class CentralIndexingServer {
         }
     }
 
-    public static void updateIndex(Peer modifiedPeer) {
+    public static synchronized void updateIndex(Peer modifiedPeer) {
         // Remove all files of the modified peer from the index
         for (ArrayList<Peer> peers : index.values()) {
             peers.removeIf(peer -> peer.equals(modifiedPeer));
@@ -100,7 +100,7 @@ public class CentralIndexingServer {
 
     }
 
-    public static void registry(int peerId, int numFiles, ArrayList<String> fileNames, String directory, String address, int port) {
+    public static synchronized void registry(int peerId, int numFiles, ArrayList<String> fileNames, String directory, String address, int port) {
         Peer newPeer = new Peer(peerId, numFiles, fileNames, directory, address, port);
         for (String fileName : fileNames) {
             if (index.containsKey(fileName)) {

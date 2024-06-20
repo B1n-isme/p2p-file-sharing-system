@@ -190,7 +190,7 @@ public class Server extends Thread {
                     Set<String> allFileNames = new HashSet<>(); // Use a HashSet to avoid duplicates
 
                     for (Peer p : allPeers2) {
-                        p.refreshFileList();
+                        //p.refreshFileList();
                         allFileNames.addAll(p.getFileNames());
                     }
 

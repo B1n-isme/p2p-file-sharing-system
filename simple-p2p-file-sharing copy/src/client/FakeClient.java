@@ -75,10 +75,10 @@ public class FakeClient {
 
     public static void main(String[] args) {
         // Number of fake clients to simulate
-        int numberOfClients = 500;
+        int numberOfClients = 400;
 
         // Parameters for the fake clients
-        String serverAddress = "172.16.133.108";
+        String serverAddress = "172.16.131.231";
         int serverPort = 3434;
 
         Random random = new Random();
@@ -87,7 +87,7 @@ public class FakeClient {
         for (int i = 0; i < numberOfClients; i++) {
             // Generate a unique directory and client port for each fake client
             String folderDirectory = "client_" + i + "_dir";
-            int clientPort = 5000 + random.nextInt(1000); // Assign a random port for each fake client
+            int clientPort = 5000 + i; // Assign a random port for each fake client
 
             // Create the directory
             try {

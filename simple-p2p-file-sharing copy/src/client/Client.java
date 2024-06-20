@@ -69,7 +69,7 @@ public class Client {
 		frame.setLocationRelativeTo(null);
 
 
-		ImageIcon background = new ImageIcon("/Users/binnu/Library/CloudStorage/OneDrive-student.vgu.edu.vn/Semester 6/Distributed System/P2P_PROJECT/p2p-file-sharing-system/simple-p2p-file-sharing copy/background.jpg"); // Replace with your image path
+		ImageIcon background = new ImageIcon("simple-p2p-file-sharing copy/background.jpg"); // Replace with your image path
 		backgroundLabel = new JLabel();
 		backgroundLabel.setIcon(background);
 		backgroundLabel.setHorizontalAlignment(JLabel.CENTER);
